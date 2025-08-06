@@ -17,7 +17,7 @@
             transition: background 3s ease-in-out;
         }
 
-        /* НОВОЕ: Стили для экрана-заставки */
+        /* Стили для экрана-заставки */
         #start-overlay {
             position: fixed;
             top: 0;
@@ -44,8 +44,8 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             color: var(--accent-color);
             transition: background 3s ease-in-out;
-            max-width: 345px;
-            /* НОВОЕ: Изначально плеер скрыт */
+            /* ИЗМЕНЕНО: Плеер уменьшен еще на 15% */
+            max-width: 300px;
             opacity: 0;
             transform: scale(0.95);
             transition: opacity 0.5s ease-in, transform 0.5s ease-in;
@@ -134,11 +134,12 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 overflow-hidden">
 
-    <!-- НОВЫЙ БЛОК: Экран-заставка -->
+    <!-- Экран-заставка -->
     <div id="start-overlay">
-        <button id="start-btn" class="text-white text-lg font-semibold bg-black/20 px-6 py-3 rounded-full border border-white/30 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            Начать
+        <!-- ИЗМЕНЕНО: Кнопка стала более праздничной -->
+        <button id="start-btn" class="text-white text-lg font-semibold bg-black/20 px-6 py-3 rounded-full border border-white/30 flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+            Открыть подарок
         </button>
     </div>
 
@@ -205,7 +206,6 @@
             const nextBtn = document.getElementById('next-btn');
             const dotsContainer = document.getElementById('carousel-dots');
             
-            // НОВОЕ: Элементы заставки
             const startOverlay = document.getElementById('start-overlay');
             const startBtn = document.getElementById('start-btn');
             const playerContainer = document.querySelector('.player-container');
@@ -408,20 +408,15 @@
                 }
             }
 
-            // НОВОЕ: Логика для заставки
             function initApp() {
-                // Показываем плеер
                 playerContainer.classList.add('visible');
-                // Убираем заставку
                 startOverlay.style.opacity = 0;
                 setTimeout(() => {
                     startOverlay.style.display = 'none';
                 }, 500);
 
-                // Загружаем трек и начинаем анимации
                 loadTrack();
                 
-                // Предзагружаем аудио, чтобы оно было готово к воспроизведению
                 audioPlayer.load();
             }
 
@@ -446,7 +441,6 @@
             audioPlayer.loop = true; 
             progressContainer.addEventListener('click', setProgress);
 
-            // loadTrack() теперь вызывается после нажатия на startBtn
         });
     </script>
 </body>
