@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Свадебный плейлист</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            /* Подключаем элегантные шрифты */
+            font-family: 'Lato', sans-serif;
+            /* Светлый, теплый фон с текстурой бумаги */
+            background-color: #fdfaf6;
+            background-image: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
+        }
+        .player-container {
+            /* Белый контейнер с мягкой тенью */
+            background-color: #ffffff;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+            color: #333333; /* Темно-серый текст для лучшей читаемости */
+        }
+        #track-title, .congrats-heading {
+            /* Заголовок с акцентным шрифтом */
+            font-family: 'Playfair Display', serif;
+        }
+        .playlist-item.active {
+            /* Подсветка активного трека в золотистых тонах */
+            background-color: #f0e8d9;
+            color: #8c6f42;
+        }
+        .control-btn:hover {
+            background-color: #f5f5f5;
+        }
+        .control-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        audio {
+            display: none;
+        }
+        .progress-container {
+            background-color: #e0e0e0;
+            cursor: pointer;
+        }
+        .progress-bar {
+            /* Золотой цвет для шкалы прогресса */
+            background-color: #c0a062;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="player-container w-full max-w-sm rounded-2xl p-6">
+
+        <!-- Поздравительное сообщение -->
+        <div class="congrats-message text-center mb-6 border-b border-gray-200 pb-6">
+            <h3 class="congrats-heading text-xl font-bold text-gray-800 mb-2">Дорогие Алиса и Влад!</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">
+                В этот торжественный день, когда рождается ваша семья, от всей души желаем вам благополучия и крепкого здоровья. Эти композиции созданы благодаря нейросетям, и мы решили, что одного трека будет недостаточно для такого особенного случая. Поэтому с радостью дарим вам целый плейлист в подарок.
+            </p>
+        </div>
+
+        <!-- Информация о треке -->
+        <div class="track-info text-center mb-4">
+            <img id="cover-art" src="" alt="Обложка трека" class="w-48 h-48 mx-auto rounded-lg shadow-md mb-4 object-cover">
+            <h2 id="track-title" class="text-2xl font-bold text-gray-800">Название трека</h2>
+            <p id="track-artist" class="text-sm text-gray-500">Исполнитель</p>
+        </div>
+
+        <!-- Аудио элемент (скрыт) -->
+        <audio id="audio-player"></audio>
+
+        <!-- Шкала времени -->
+        <div id="progress-container" class="progress-container w-full h-1.5 rounded-full mb-2">
+            <div id="progress-bar" class="progress-bar h-full rounded-full w-0"></div>
+        </div>
+        <div class="time-display flex justify-between text-xs text-gray-500 mb-4">
+            <span id="current-time">0:00</span>
+            <span id="total-duration">0:00</span>
+        </div>
+
+        <!-- Кастомные элементы управления -->
+        <div class="controls flex justify-center items-center gap-6 mb-6">
+            <button id="prev-btn" class="control-btn p-3 rounded-full transition-colors text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
+            </button>
+            <button id="play-pause-btn" class="control-btn bg-[#c0a062] text-white p-4 rounded-full transition-colors shadow-md">
+                <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="hidden"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+            <button id="next-btn" class="control-btn p-3 rounded-full transition-colors text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+            </button>
+        </div>
+
+        <!-- Список воспроизведения -->
+        <div id="playlist" class="space-y-2 max-h-40 overflow-y-auto pr-2">
+            <!-- Элементы плейлиста будут добавлены сюда с помощью JS -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Элементы DOM ---
+            const audioPlayer = document.getElementById('audio-player');
+            const coverArt = document.getElementById('cover-art');
+            const trackTitle = document.getElementById('track-title');
+            const trackArtist = document.getElementById('track-artist');
+            const playlistContainer = document.getElementById('playlist');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const playIcon = document.getElementById('play-icon');
+            const pauseIcon = document.getElementById('pause-icon');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const currentTimeEl = document.getElementById('current-time');
+            const totalDurationEl = document.getElementById('total-duration');
+
+            // --- Данные плейлиста (в свадебной тематике) ---
+            // ИСПРАВЛЕНИЕ: Все ссылки унифицированы для одного репозитория.
+            const playlist = [
+                {
+                    title: 'От Друзей',
+                    artist: 'Друзья',
+                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/01_From_friends.mp3',
+                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/01_From_friends.png'
+                },
+                {
+                    title: 'Короли Вечерин',
+                    artist: 'Друзья',
+                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/02_the_Kings_of_the_Partiez.mp3',
+                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/02_the_Kings_of_the_Partiez.png'
+                },
+                {
+                    title: 'Свадьба - Карнавал',
+                    artist: 'Друзья',
+                    // ИСПРАВЛЕНИЕ: Добавлено расширение .mp3
+                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/03_Wedding-Carnival.mp3',
+                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/03_Wedding-Carnival.png'
+                },
+                {
+                    title: 'Сквозь бурю и метель',
+                    artist: 'Друзья',
+                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/04_Through_the_storm_and_snowstorm.mp3',
+                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/04_Through_the_storm_and_snowstorm.png'
+                },
+		        {
+                    title: 'Свадьба века',
+                    artist: 'Друзья',
+                    // ИСПРАВЛЕНИЕ: Пробел заменен на нижнее подчеркивание для надежности
+                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/05_the_Wedding_of_the_Century.mp3',
+                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/05_the_Wedding_of_the_Century.png'
+                }
+            ];
+
+            let currentTrackIndex = 0;
+            let isPlaying = false;
+
+            // --- Функции ---
+
+            function loadTrack(index) {
+                const track = playlist[index];
+                trackTitle.textContent = track.title;
+                trackArtist.textContent = track.artist;
+                coverArt.src = track.cover;
+                coverArt.onerror = () => { coverArt.src = 'https://placehold.co/300x300/EAE0D5/8C6F42?text=Error'; };
+                audioPlayer.src = track.src;
+                updatePlaylistUI();
+            }
+
+            function updatePlaylistUI() {
+                const items = document.querySelectorAll('.playlist-item');
+                items.forEach((item, index) => {
+                    item.classList.toggle('active', index === currentTrackIndex);
+                });
+            }
+            
+            function renderPlaylist() {
+                playlistContainer.innerHTML = '';
+                playlist.forEach((track, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'playlist-item p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors flex justify-between items-center';
+                    item.dataset.index = index;
+                    item.innerHTML = `
+                        <div>
+                            <p class="font-semibold text-sm text-gray-700">${track.title}</p>
+                            <p class="text-xs text-gray-500">${track.artist}</p>
+                        </div>
+                        <div class="status-icon"></div>
+                    `;
+                    item.addEventListener('click', () => {
+                        currentTrackIndex = index;
+                        loadTrack(currentTrackIndex);
+                        playTrack();
+                    });
+                    playlistContainer.appendChild(item);
+                });
+            }
+
+            function playTrack() {
+                isPlaying = true;
+                audioPlayer.play();
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            }
+
+            function pauseTrack() {
+                isPlaying = false;
+                audioPlayer.pause();
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            }
+            
+            function togglePlayPause() {
+                isPlaying ? pauseTrack() : playTrack();
+            }
+
+            function prevTrack() {
+                currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+                loadTrack(currentTrackIndex);
+                playTrack();
+            }
+
+            function nextTrack() {
+                currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+                loadTrack(currentTrackIndex);
+                playTrack();
+            }
+
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+
+            function updateProgress() {
+                const { duration, currentTime } = audioPlayer;
+                if (duration) {
+                    const progressPercent = (currentTime / duration) * 100;
+                    progressBar.style.width = `${progressPercent}%`;
+                    currentTimeEl.textContent = formatTime(currentTime);
+                }
+            }
+            
+            function setProgress(e) {
+                const width = this.clientWidth;
+                const clickX = e.offsetX;
+                const duration = audioPlayer.duration;
+                if (duration) {
+                    audioPlayer.currentTime = (clickX / width) * duration;
+                }
+            }
+
+            // --- Инициализация и обработчики событий ---
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            prevBtn.addEventListener('click', prevTrack);
+            nextBtn.addEventListener('click', nextTrack);
+            audioPlayer.addEventListener('ended', nextTrack);
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            audioPlayer.addEventListener('loadedmetadata', () => {
+                 totalDurationEl.textContent = formatTime(audioPlayer.duration);
+            });
+            progressContainer.addEventListener('click', setProgress);
+
+            renderPlaylist();
+            loadTrack(currentTrackIndex);
+        });
+    </script>
+</body>
+</html>
