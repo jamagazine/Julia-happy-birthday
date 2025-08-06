@@ -9,113 +9,141 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* --- Концепция "Акварельное воспоминание" --- */
-        :root {
-            --dusty-rose: #DAB8C2;
-            --sage-green: #B2B8A3;
-            --graphite: #4A4A4A;
-            --milky: #F8F7F4;
-        }
-
+        /* CSS переменные теперь будут меняться через JS */
         body {
             font-family: 'Lato', sans-serif;
-            /* Молочный фон с легким акварельным эффектом по углам */
-            background-color: var(--milky);
-            background-image: 
-                radial-gradient(circle at top left, rgba(218, 184, 194, 0.1), transparent 30%),
-                radial-gradient(circle at bottom right, rgba(178, 184, 163, 0.1), transparent 30%);
-            color: var(--graphite);
+            background: linear-gradient(160deg, var(--bg-start), var(--bg-end));
+            color: var(--text-color);
+            /* НОВОЕ: Плавный переход для фона */
+            transition: background 2s ease;
         }
 
         .player-container {
-            background-color: #ffffff;
-            /* Мягкая, рассеянная тень для эффекта "парения" */
-            box-shadow: 0 8px 40px rgba(74, 74, 74, 0.1);
-            color: var(--graphite);
+            background: var(--player-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid rgba(244, 241, 234, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            color: var(--accent-color);
+            /* НОВОЕ: Плавный переход для подложки плеера */
+            transition: background 2s ease;
         }
 
         #track-title, .congrats-heading {
             font-family: 'Playfair Display', serif;
         }
         
-        /* Стилизация фото под карточку Polaroid */
         #cover-art {
             transition: opacity 0.7s ease-in-out;
-            border: 1px solid #eee;
+            border: 2px solid var(--accent-color);
             padding: 4px;
-            background-color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            background-color: transparent; 
         }
 
-        .control-btn {
-            color: var(--sage-green);
-        }
-
-        .control-btn:hover {
-            background-color: rgba(178, 184, 163, 0.1);
+        .control-btn, .carousel-dot, .progress-bar {
+            background-color: transparent;
+            color: var(--accent-color);
+            /* НОВОЕ: Плавный переход для акцентных элементов */
+            transition: color 2s ease, background-color 2s ease, opacity 2s ease;
         }
         
-        /* Главная кнопка в цвете пыльной розы */
         #play-pause-btn {
-            background-color: var(--dusty-rose);
-            color: white;
+            background-color: rgba(244, 241, 234, 0.15);
         }
-        #play-pause-btn:hover {
-             background-color: #d4aebb; /* Чуть темнее при наведении */
-        }
-
-        audio {
-            display: none;
-        }
-
+        
         .progress-container {
-            background-color: #e0e0e0;
+            background-color: rgba(244, 241, 234, 0.2);
+        }
+        
+        .progress-bar {
+             background-color: var(--accent-color);
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            opacity: 0.4;
             cursor: pointer;
         }
-        
-        /* Полоса прогресса в цвете пыльной розы */
-        .progress-bar {
-            background-color: var(--dusty-rose);
+
+        .carousel-dot.active {
+            opacity: 1;
         }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 var(--pulse-color), 0 4px 15px rgba(0,0,0,0.2);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(244, 241, 234, 0), 0 4px 15px rgba(0,0,0,0.2);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 241, 234, 0), 0 4px 15px rgba(0,0,0,0.2);
+            }
+        }
+
+        .animate-on-load {
+            opacity: 0;
+            animation: fadeInUp 0.7s ease-out forwards;
+        }
+
+        .pulsing-btn {
+            animation: pulse 2s infinite;
+        }
+
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen p-4 overflow-hidden">
 
-    <div class="player-container w-full max-w-sm rounded-2xl p-6">
+    <div class="player-container w-full max-w-sm p-6">
 
-        <!-- Поздравительное сообщение -->
-        <div class="congrats-message text-center mb-6 border-b border-gray-200 pb-6">
+        <div class="congrats-message text-center mb-6 border-b pb-6 animate-on-load" style="animation-delay: 0.2s; border-color: rgba(244, 241, 234, 0.2);">
             <h3 class="congrats-heading text-xl font-bold mb-2">Юля, с Днём Рождения!</h3>
-            <p class="text-sm leading-relaxed">
-                Я благодарна за день, когда тебя нашла, за свет твоей души, за твою дружбу.
+            <p class="text-sm leading-relaxed opacity-80">
+                Эта песня для тебя!
             </p>
         </div>
 
-        <!-- Информация о треке и карусель -->
-        <div class="track-info text-center mb-4">
-            <img id="cover-art" src="https://placehold.co/300x300/DAB8C2/4A4A4A?text=Фото+1" alt="Фото-воспоминание" class="w-48 h-48 mx-auto rounded-lg object-cover">
-            <h2 id="track-title" class="text-2xl font-bold">Для тебя</h2>
-            <p id="track-artist" class="text-sm text-gray-500">Диана</p>
+        <div class="track-info mb-4 animate-on-load" style="animation-delay: 0.4s;">
+            <img id="cover-art" src="" alt="Фото-воспоминание" class="w-full aspect-square rounded-lg object-cover">
+            <div id="carousel-dots" class="flex justify-center gap-2 mt-4"></div>
+            <div class="text-center mt-2">
+                <h2 id="track-title" class="text-2xl font-bold">Для тебя</h2>
+                <p id="track-artist" class="text-sm opacity-70">Диана</p>
+            </div>
         </div>
 
-        <!-- Аудио элемент (скрыт) -->
-        <audio id="audio-player" loop></audio>
+        <audio id="audio-player" loop crossorigin="anonymous"></audio>
 
-        <!-- Шкала времени -->
-        <div id="progress-container" class="progress-container w-full h-1.5 rounded-full mb-2">
-            <div id="progress-bar" class="progress-bar h-full rounded-full w-0"></div>
-        </div>
-        <div class="time-display flex justify-between text-xs text-gray-500 mb-4">
-            <span id="current-time">0:00</span>
-            <span id="total-duration">0:00</span>
+        <div class="animate-on-load" style="animation-delay: 0.6s;">
+            <div id="progress-container" class="progress-container w-full h-1.5 rounded-full mb-2">
+                <div id="progress-bar" class="progress-bar h-full rounded-full w-0"></div>
+            </div>
+            <div class="time-display flex justify-between text-xs opacity-70 mb-4">
+                <span id="current-time">0:00</span>
+                <span id="total-duration">0:00</span>
+            </div>
         </div>
 
-        <!-- Кастомные элементы управления -->
-        <div class="controls flex justify-center items-center gap-6 mb-6">
+        <div class="controls flex justify-center items-center gap-6 mb-6 animate-on-load" style="animation-delay: 0.8s;">
             <button id="prev-btn" class="control-btn p-3 rounded-full transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
             </button>
-            <button id="play-pause-btn" class="p-4 rounded-full transition-colors shadow-md">
+            <button id="play-pause-btn" class="p-4 rounded-full transition-colors">
                 <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="hidden"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
             </button>
@@ -128,7 +156,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Элементы DOM ---
+            const root = document.documentElement;
             const audioPlayer = document.getElementById('audio-player');
             const coverArt = document.getElementById('cover-art');
             const trackTitle = document.getElementById('track-title');
@@ -142,55 +170,136 @@
             const totalDurationEl = document.getElementById('total-duration');
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
+            const dotsContainer = document.getElementById('carousel-dots');
 
-            // --- Данные для открытки ---
             const trackData = {
                 title: 'Для тебя',
                 artist: 'Диана',
-                // ВАЖНО: Укажите здесь прямую ссылку на ваш аудиофайл
                 src: 'https://jamagazine.github.io/Julia-happy-birthday/For_you.mp3' 
             };
 
-            // ЗАМЕНИТЕ ЭТИ ССЫЛКИ НА ССЫЛКИ НА ВАШИ ФОТОГРАФИИ
-            const slideshowImages = [
-                'https://jamagazine.github.io/Julia-happy-birthday/1.png',
-                'https://jamagazine.github.io/Julia-happy-birthday/2.png',
-                'https://jamagazine.github.io/Julia-happy-birthday/3.png',
-                'https://jamagazine.github.io/Julia-happy-birthday/4.png',
-                'https://jamagazine.github.io/Julia-happy-birthday/5.png'
+            const slides = [
+                {
+                    src: 'https://jamagazine.github.io/Julia-happy-birthday/1.png',
+                    palette: {
+                        '--bg-start': '#A4B0C0',
+                        '--bg-end': '#EACDA3',
+                        '--player-bg': 'rgba(80, 70, 65, 0.6)',
+                        '--accent-color': '#F4F1EA',
+                        '--pulse-color': 'rgba(244, 241, 234, 0.4)'
+                    }
+                },
+                {
+                    src: 'https://jamagazine.github.io/Julia-happy-birthday/2.png',
+                    palette: {
+                        '--bg-start': '#B4C5D1',
+                        '--bg-end': '#5E7383',
+                        '--player-bg': 'rgba(60, 75, 88, 0.6)',
+                        '--accent-color': '#FFFFFF',
+                        '--pulse-color': 'rgba(255, 255, 255, 0.4)'
+                    }
+                },
+                {
+                    src: 'https://jamagazine.github.io/Julia-happy-birthday/3.png',
+                    palette: {
+                        '--bg-start': '#4A5C70',
+                        '--bg-end': '#E3A587',
+                        '--player-bg': 'rgba(50, 60, 75, 0.6)',
+                        '--accent-color': '#FDEFE2',
+                        '--pulse-color': 'rgba(253, 239, 226, 0.4)'
+                    }
+                },
+                {
+                    src: 'https://jamagazine.github.io/Julia-happy-birthday/4.png',
+                    palette: {
+                        '--bg-start': '#DDC3A5',
+                        '--bg-end': '#C0A383',
+                        '--player-bg': 'rgba(90, 78, 67, 0.6)',
+                        '--accent-color': '#FFFBF5',
+                        '--pulse-color': 'rgba(255, 251, 245, 0.4)'
+                    }
+                },
+                {
+                    src: 'https://jamagazine.github.io/Julia-happy-birthday/5.png',
+                    palette: {
+                        '--bg-start': '#7DA0C4',
+                        '--bg-end': '#B7CDE5',
+                        '--player-bg': 'rgba(70, 85, 105, 0.6)',
+                        '--accent-color': '#FFFFFF',
+                        '--pulse-color': 'rgba(255, 255, 255, 0.4)'
+                    }
+                }
             ];
 
             let isPlaying = false;
             let currentImageIndex = 0;
             let slideshowInterval;
 
-            // --- Функции ---
+            function applyPalette(palette) {
+                for (const [key, value] of Object.entries(palette)) {
+                    root.style.setProperty(key, value);
+                }
+            }
+
+            function renderDots() {
+                dotsContainer.innerHTML = '';
+                slides.forEach((_, index) => {
+                    const dot = document.createElement('span');
+                    dot.classList.add('carousel-dot');
+                    dot.dataset.index = index;
+                    dot.addEventListener('click', (e) => {
+                        const clickedIndex = parseInt(e.target.dataset.index);
+                        showSlide(clickedIndex);
+                        restartSlideshow();
+                    });
+                    dotsContainer.appendChild(dot);
+                });
+            }
+
+            function updateActiveDot() {
+                const dots = document.querySelectorAll('.carousel-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentImageIndex);
+                });
+            }
 
             function loadTrack() {
                 trackTitle.textContent = trackData.title;
                 trackArtist.textContent = trackData.artist;
                 audioPlayer.src = trackData.src;
-                showImage(0);
+                renderDots();
+                showSlide(0);
+                playPauseBtn.classList.add('pulsing-btn');
             }
             
-            function showImage(index) {
+            function showSlide(index) {
                 currentImageIndex = index;
+                const currentSlide = slides[index];
+                
+                applyPalette(currentSlide.palette);
+
                 coverArt.style.opacity = 0;
                 setTimeout(() => {
-                    coverArt.src = slideshowImages[currentImageIndex];
-                    coverArt.onerror = () => { coverArt.src = 'https://placehold.co/300x300/EAE0D5/4A4A4A?text=Error'; };
+                    coverArt.src = currentSlide.src;
+                    coverArt.onerror = () => { 
+                        console.error(`Ошибка загрузки изображения: ${currentSlide.src}`);
+                        coverArt.src = 'https://placehold.co/400x400/000/fff?text=Error+loading+image'; 
+                    };
                     coverArt.style.opacity = 1;
+                    updateActiveDot();
                 }, 700);
             }
 
-            function nextImage() {
-                const newIndex = (currentImageIndex + 1) % slideshowImages.length;
-                showImage(newIndex);
+            function nextSlide() {
+                const newIndex = (currentImageIndex + 1) % slides.length;
+                showSlide(newIndex);
             }
 
-            function prevImage() {
-                const newIndex = (currentImageIndex - 1 + slideshowImages.length) % slideshowImages.length;
-                showImage(newIndex);
+
+
+            function prevSlide() {
+                const newIndex = (currentImageIndex - 1 + slides.length) % slides.length;
+                showSlide(newIndex);
             }
             
             function restartSlideshow() {
@@ -202,19 +311,24 @@
 
             function startSlideshow() {
                 clearInterval(slideshowInterval);
-                slideshowInterval = setInterval(nextImage, 4000); 
+                slideshowInterval = setInterval(nextSlide, 4000); 
             }
 
             function stopSlideshow() {
                 clearInterval(slideshowInterval);
             }
 
-            function playTrack() {
-                isPlaying = true;
-                audioPlayer.play();
-                playIcon.classList.add('hidden');
-                pauseIcon.classList.remove('hidden');
-                startSlideshow(); 
+            async function playTrack() {
+                try {
+                    await audioPlayer.play();
+                    isPlaying = true;
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                    startSlideshow();
+                    playPauseBtn.classList.remove('pulsing-btn');
+                } catch (err) {
+                    console.error("Ошибка при попытке воспроизведения:", err);
+                }
             }
 
             function pauseTrack() {
@@ -223,10 +337,15 @@
                 playIcon.classList.remove('hidden');
                 pauseIcon.classList.add('hidden');
                 stopSlideshow(); 
+                playPauseBtn.classList.add('pulsing-btn');
             }
             
             function togglePlayPause() {
-                isPlaying ? pauseTrack() : playTrack();
+                if (audioPlayer.readyState >= 2) { 
+                    isPlaying ? pauseTrack() : playTrack();
+                } else {
+                    console.warn("Аудио еще не готово к воспроизведению.");
+                }
             }
 
             function formatTime(seconds) {
@@ -253,16 +372,15 @@
                 }
             }
 
-            // --- Инициализация и обработчики событий ---
             playPauseBtn.addEventListener('click', togglePlayPause);
             
             nextBtn.addEventListener('click', () => {
-                nextImage();
+                nextSlide();
                 restartSlideshow();
             });
 
             prevBtn.addEventListener('click', () => {
-                prevImage();
+                prevSlide();
                 restartSlideshow();
             });
 
@@ -278,7 +396,3 @@
     </script>
 </body>
 </html>
-
-
-
-
