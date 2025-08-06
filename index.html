@@ -44,7 +44,6 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             color: var(--accent-color);
             transition: background 3s ease-in-out;
-            /* ИЗМЕНЕНО: Плеер уменьшен еще на 15% */
             max-width: 300px;
             opacity: 0;
             transform: scale(0.95);
@@ -136,7 +135,6 @@
 
     <!-- Экран-заставка -->
     <div id="start-overlay">
-        <!-- ИЗМЕНЕНО: Кнопка стала более праздничной -->
         <button id="start-btn" class="text-white text-lg font-semibold bg-black/20 px-6 py-3 rounded-full border border-white/30 flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
             Открыть подарок
@@ -145,8 +143,8 @@
 
     <div class="player-container w-full p-6">
 
-        <div class="congrats-message text-center mb-6 border-b pb-6 animate-on-load" style="animation-delay: 0.2s; border-color: rgba(244, 241, 234, 0.2);">
-            <h3 class="congrats-heading text-xl font-bold mb-2">Юля, с Днём Рождения!</h3>
+        <div class="congrats-message text-center mb-4 border-b pb-4 animate-on-load" style="animation-delay: 0.2s; border-color: rgba(244, 241, 234, 0.2);">
+            <h3 class="congrats-heading text-xl font-bold">Юля, с Днём Рождения!</h3>
         </div>
 
         <div class="track-info mb-4 animate-on-load" style="animation-delay: 0.4s;">
@@ -268,7 +266,14 @@
 
             let isPlaying = false;
             let currentImageIndex = 0;
-            let slideshowInterval;
+            
+            // ИЗМЕНЕНО: Убираем setInterval
+            // let slideshowInterval;
+
+            // ИЗМЕНЕНО: Логика синхронизации со временем трека
+            let slideChangeTimestamps = [];
+            let lastTime = 0;
+
 
             function applyPalette(palette) {
                 for (const [key, value] of Object.entries(palette)) {
@@ -285,7 +290,6 @@
                     dot.addEventListener('click', (e) => {
                         const clickedIndex = parseInt(e.target.dataset.index);
                         showSlide(clickedIndex);
-                        restartSlideshow();
                     });
                     dotsContainer.appendChild(dot);
                 });
@@ -307,7 +311,10 @@
                 playPauseBtn.classList.add('pulsing-btn');
             }
             
-            function showSlide(index) {
+            function showSlide(index, manual = false) {
+                // Предотвращаем выход за пределы массива
+                if (index < 0 || index >= slides.length) return;
+
                 currentImageIndex = index;
                 const currentSlide = slides[index];
                 
@@ -323,41 +330,33 @@
                     coverArt.style.opacity = 1;
                     updateActiveDot();
                 }, 600);
-            }
-
-            function nextSlide() {
-                const newIndex = (currentImageIndex + 1) % slides.length;
-                showSlide(newIndex);
-            }
-
-            function prevSlide() {
-                const newIndex = (currentImageIndex - 1 + slides.length) % slides.length;
-                showSlide(newIndex);
-            }
-            
-            function restartSlideshow() {
-                stopSlideshow();
-                if (isPlaying) {
-                    startSlideshow();
+                
+                // Если сменили вручную, перематываем трек на начало этого слайда
+                if (manual && audioPlayer.duration) {
+                    audioPlayer.currentTime = slideChangeTimestamps[index];
                 }
             }
 
-            function startSlideshow() {
-                clearInterval(slideshowInterval);
-                slideshowInterval = setInterval(nextSlide, 10000); 
+            function nextSlide(manual = false) {
+                const newIndex = currentImageIndex + 1;
+                if (newIndex < slides.length) {
+                    showSlide(newIndex, manual);
+                }
             }
 
-            function stopSlideshow() {
-                clearInterval(slideshowInterval);
+            function prevSlide(manual = false) {
+                const newIndex = currentImageIndex - 1;
+                 if (newIndex >= 0) {
+                    showSlide(newIndex, manual);
+                }
             }
-
+            
             async function playTrack() {
                 try {
                     await audioPlayer.play();
                     isPlaying = true;
                     playIcon.classList.add('hidden');
                     pauseIcon.classList.remove('hidden');
-                    startSlideshow();
                     playPauseBtn.classList.remove('pulsing-btn');
                 } catch (err) {
                     console.error("Ошибка при попытке воспроизведения:", err);
@@ -369,7 +368,6 @@
                 audioPlayer.pause();
                 playIcon.classList.remove('hidden');
                 pauseIcon.classList.add('hidden');
-                stopSlideshow(); 
                 playPauseBtn.classList.add('pulsing-btn');
             }
             
@@ -393,6 +391,18 @@
                     const progressPercent = (currentTime / duration) * 100;
                     progressBar.style.width = `${progressPercent}%`;
                     currentTimeEl.textContent = formatTime(currentTime);
+
+                    // ИЗМЕНЕНО: Логика смены слайдов по времени
+                    const nextTimestamp = slideChangeTimestamps[currentImageIndex + 1];
+                    if (isPlaying && currentTime >= nextTimestamp) {
+                        nextSlide();
+                    }
+
+                    // Отслеживание перезапуска трека
+                    if (currentTime < lastTime && lastTime > duration - 1) {
+                        showSlide(0);
+                    }
+                    lastTime = currentTime;
                 }
             }
             
@@ -402,6 +412,9 @@
                 const duration = audioPlayer.duration;
                 if (duration) {
                     audioPlayer.currentTime = (clickX / width) * duration;
+                    // ИЗМЕНЕНО: Находим правильный слайд после перемотки
+                    const newIndex = slideChangeTimestamps.findIndex(time => time > audioPlayer.currentTime) - 1;
+                    showSlide(newIndex >= 0 ? newIndex : 0);
                 }
             }
 
@@ -422,19 +435,24 @@
             playPauseBtn.addEventListener('click', togglePlayPause);
             
             nextBtn.addEventListener('click', () => {
-                nextSlide();
-                restartSlideshow();
+                nextSlide(true);
             });
 
             prevBtn.addEventListener('click', () => {
-                prevSlide();
-                restartSlideshow();
+                prevSlide(true);
             });
 
             audioPlayer.addEventListener('timeupdate', updateProgress);
+            
             audioPlayer.addEventListener('loadedmetadata', () => {
-                 totalDurationEl.textContent = formatTime(audioPlayer.duration);
+                 const duration = audioPlayer.duration;
+                 totalDurationEl.textContent = formatTime(duration);
+                 // ИЗМЕНЕНО: Рассчитываем временные метки для смены слайдов
+                 const interval = duration / slides.length;
+                 slideChangeTimestamps = slides.map((_, index) => index * interval);
+                 slideChangeTimestamps.push(duration); // Добавляем конец трека
             });
+
             audioPlayer.loop = true; 
             progressContainer.addEventListener('click', setProgress);
 
