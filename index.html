@@ -3,51 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Свадебный плейлист</title>
+    <title>С Днем Рождения, Юля!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* --- Концепция "Акварельное воспоминание" --- */
+        :root {
+            --dusty-rose: #DAB8C2;
+            --sage-green: #B2B8A3;
+            --graphite: #4A4A4A;
+            --milky: #F8F7F4;
+        }
+
         body {
-            /* Подключаем элегантные шрифты */
             font-family: 'Lato', sans-serif;
-            /* Светлый, теплый фон с текстурой бумаги */
-            background-color: #fdfaf6;
-            background-image: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
+            /* Молочный фон с легким акварельным эффектом по углам */
+            background-color: var(--milky);
+            background-image: 
+                radial-gradient(circle at top left, rgba(218, 184, 194, 0.1), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(178, 184, 163, 0.1), transparent 30%);
+            color: var(--graphite);
         }
+
         .player-container {
-            /* Белый контейнер с мягкой тенью */
             background-color: #ffffff;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
-            color: #333333; /* Темно-серый текст для лучшей читаемости */
+            /* Мягкая, рассеянная тень для эффекта "парения" */
+            box-shadow: 0 8px 40px rgba(74, 74, 74, 0.1);
+            color: var(--graphite);
         }
+
         #track-title, .congrats-heading {
-            /* Заголовок с акцентным шрифтом */
             font-family: 'Playfair Display', serif;
         }
-        .playlist-item.active {
-            /* Подсветка активного трека в золотистых тонах */
-            background-color: #f0e8d9;
-            color: #8c6f42;
+        
+        /* Стилизация фото под карточку Polaroid */
+        #cover-art {
+            transition: opacity 0.7s ease-in-out;
+            border: 1px solid #eee;
+            padding: 4px;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
+
+        .control-btn {
+            color: var(--sage-green);
+        }
+
         .control-btn:hover {
-            background-color: #f5f5f5;
+            background-color: rgba(178, 184, 163, 0.1);
         }
-        .control-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+        
+        /* Главная кнопка в цвете пыльной розы */
+        #play-pause-btn {
+            background-color: var(--dusty-rose);
+            color: white;
         }
+        #play-pause-btn:hover {
+             background-color: #d4aebb; /* Чуть темнее при наведении */
+        }
+
         audio {
             display: none;
         }
+
         .progress-container {
             background-color: #e0e0e0;
             cursor: pointer;
         }
+        
+        /* Полоса прогресса в цвете пыльной розы */
         .progress-bar {
-            /* Золотой цвет для шкалы прогресса */
-            background-color: #c0a062;
+            background-color: var(--dusty-rose);
         }
     </style>
 </head>
@@ -57,21 +85,21 @@
 
         <!-- Поздравительное сообщение -->
         <div class="congrats-message text-center mb-6 border-b border-gray-200 pb-6">
-            <h3 class="congrats-heading text-xl font-bold text-gray-800 mb-2">Дорогие Алиса и Влад!</h3>
-            <p class="text-sm text-gray-600 leading-relaxed">
-                В этот торжественный день, когда рождается ваша семья, от всей души желаем вам благополучия и крепкого здоровья. Эти композиции созданы благодаря нейросетям, и мы решили, что одного трека будет недостаточно для такого особенного случая. Поэтому с радостью дарим вам целый плейлист в подарок.
+            <h3 class="congrats-heading text-xl font-bold mb-2">Юля, с Днём Рождения!</h3>
+            <p class="text-sm leading-relaxed">
+                Я благодарна за день, когда тебя нашла, за свет твоей души, за твою дружбу.
             </p>
         </div>
 
-        <!-- Информация о треке -->
+        <!-- Информация о треке и карусель -->
         <div class="track-info text-center mb-4">
-            <img id="cover-art" src="" alt="Обложка трека" class="w-48 h-48 mx-auto rounded-lg shadow-md mb-4 object-cover">
-            <h2 id="track-title" class="text-2xl font-bold text-gray-800">Название трека</h2>
-            <p id="track-artist" class="text-sm text-gray-500">Исполнитель</p>
+            <img id="cover-art" src="https://placehold.co/300x300/DAB8C2/4A4A4A?text=Фото+1" alt="Фото-воспоминание" class="w-48 h-48 mx-auto rounded-lg object-cover">
+            <h2 id="track-title" class="text-2xl font-bold">Ты сможешь</h2>
+            <p id="track-artist" class="text-sm text-gray-500">От твоей подруги</p>
         </div>
 
         <!-- Аудио элемент (скрыт) -->
-        <audio id="audio-player"></audio>
+        <audio id="audio-player" loop></audio>
 
         <!-- Шкала времени -->
         <div id="progress-container" class="progress-container w-full h-1.5 rounded-full mb-2">
@@ -84,22 +112,18 @@
 
         <!-- Кастомные элементы управления -->
         <div class="controls flex justify-center items-center gap-6 mb-6">
-            <button id="prev-btn" class="control-btn p-3 rounded-full transition-colors text-gray-600">
+            <button id="prev-btn" class="control-btn p-3 rounded-full transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
             </button>
-            <button id="play-pause-btn" class="control-btn bg-[#c0a062] text-white p-4 rounded-full transition-colors shadow-md">
+            <button id="play-pause-btn" class="p-4 rounded-full transition-colors shadow-md">
                 <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="hidden"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
             </button>
-            <button id="next-btn" class="control-btn p-3 rounded-full transition-colors text-gray-600">
+            <button id="next-btn" class="control-btn p-3 rounded-full transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
             </button>
         </div>
 
-        <!-- Список воспроизведения -->
-        <div id="playlist" class="space-y-2 max-h-40 overflow-y-auto pr-2">
-            <!-- Элементы плейлиста будут добавлены сюда с помощью JS -->
-        </div>
     </div>
 
     <script>
@@ -109,9 +133,6 @@
             const coverArt = document.getElementById('cover-art');
             const trackTitle = document.getElementById('track-title');
             const trackArtist = document.getElementById('track-artist');
-            const playlistContainer = document.getElementById('playlist');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
             const playPauseBtn = document.getElementById('play-pause-btn');
             const playIcon = document.getElementById('play-icon');
             const pauseIcon = document.getElementById('pause-icon');
@@ -119,86 +140,72 @@
             const progressBar = document.getElementById('progress-bar');
             const currentTimeEl = document.getElementById('current-time');
             const totalDurationEl = document.getElementById('total-duration');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
 
-            // --- Данные плейлиста (в свадебной тематике) ---
-            // ИСПРАВЛЕНИЕ: Все ссылки унифицированы для одного репозитория.
-            const playlist = [
-                {
-                    title: 'От Друзей',
-                    artist: 'Друзья',
-                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/01_From_friends.mp3',
-                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/01_From_friends.png'
-                },
-                {
-                    title: 'Короли Вечерин',
-                    artist: 'Друзья',
-                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/02_the_Kings_of_the_Partiez.mp3',
-                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/02_the_Kings_of_the_Partiez.png'
-                },
-                {
-                    title: 'Свадьба - Карнавал',
-                    artist: 'Друзья',
-                    // ИСПРАВЛЕНИЕ: Добавлено расширение .mp3
-                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/03_Wedding-Carnival.mp3',
-                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/03_Wedding-Carnival.png'
-                },
-                {
-                    title: 'Сквозь бурю и метель',
-                    artist: 'Друзья',
-                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/04_Through_the_storm_and_snowstorm.mp3',
-                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/04_Through_the_storm_and_snowstorm.png'
-                },
-		        {
-                    title: 'Свадьба века',
-                    artist: 'Друзья',
-                    // ИСПРАВЛЕНИЕ: Пробел заменен на нижнее подчеркивание для надежности
-                    src: 'https://jamagazine.github.io/Diaghilev-s-Root/05_the_Wedding_of_the_Century.mp3',
-                    cover: 'https://jamagazine.github.io/Diaghilev-s-Root/05_the_Wedding_of_the_Century.png'
-                }
+            // --- Данные для открытки ---
+            const trackData = {
+                title: 'Ты сможешь',
+                artist: 'От твоей подруги',
+                // ВАЖНО: Укажите здесь прямую ссылку на ваш аудиофайл
+                src: 'https://github.com/jamagazine/Diaghilev-s-Root/raw/main/01_From_friends.mp3' 
+            };
+
+            // ЗАМЕНИТЕ ЭТИ ССЫЛКИ НА ССЫЛКИ НА ВАШИ ФОТОГРАФИИ
+            const slideshowImages = [
+                'https://placehold.co/300x300/DAB8C2/4A4A4A?text=Фото+1',
+                'https://placehold.co/300x300/B2B8A3/4A4A4A?text=Фото+2',
+                'https://placehold.co/300x300/EAE0D5/4A4A4A?text=Фото+3',
+                'https://placehold.co/300x300/C9C9C9/4A4A4A?text=Фото+4'
             ];
 
-            let currentTrackIndex = 0;
             let isPlaying = false;
+            let currentImageIndex = 0;
+            let slideshowInterval;
 
             // --- Функции ---
 
-            function loadTrack(index) {
-                const track = playlist[index];
-                trackTitle.textContent = track.title;
-                trackArtist.textContent = track.artist;
-                coverArt.src = track.cover;
-                coverArt.onerror = () => { coverArt.src = 'https://placehold.co/300x300/EAE0D5/8C6F42?text=Error'; };
-                audioPlayer.src = track.src;
-                updatePlaylistUI();
-            }
-
-            function updatePlaylistUI() {
-                const items = document.querySelectorAll('.playlist-item');
-                items.forEach((item, index) => {
-                    item.classList.toggle('active', index === currentTrackIndex);
-                });
+            function loadTrack() {
+                trackTitle.textContent = trackData.title;
+                trackArtist.textContent = trackData.artist;
+                audioPlayer.src = trackData.src;
+                showImage(0);
             }
             
-            function renderPlaylist() {
-                playlistContainer.innerHTML = '';
-                playlist.forEach((track, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'playlist-item p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors flex justify-between items-center';
-                    item.dataset.index = index;
-                    item.innerHTML = `
-                        <div>
-                            <p class="font-semibold text-sm text-gray-700">${track.title}</p>
-                            <p class="text-xs text-gray-500">${track.artist}</p>
-                        </div>
-                        <div class="status-icon"></div>
-                    `;
-                    item.addEventListener('click', () => {
-                        currentTrackIndex = index;
-                        loadTrack(currentTrackIndex);
-                        playTrack();
-                    });
-                    playlistContainer.appendChild(item);
-                });
+            function showImage(index) {
+                currentImageIndex = index;
+                coverArt.style.opacity = 0;
+                setTimeout(() => {
+                    coverArt.src = slideshowImages[currentImageIndex];
+                    coverArt.onerror = () => { coverArt.src = 'https://placehold.co/300x300/EAE0D5/4A4A4A?text=Error'; };
+                    coverArt.style.opacity = 1;
+                }, 700);
+            }
+
+            function nextImage() {
+                const newIndex = (currentImageIndex + 1) % slideshowImages.length;
+                showImage(newIndex);
+            }
+
+            function prevImage() {
+                const newIndex = (currentImageIndex - 1 + slideshowImages.length) % slideshowImages.length;
+                showImage(newIndex);
+            }
+            
+            function restartSlideshow() {
+                stopSlideshow();
+                if (isPlaying) {
+                    startSlideshow();
+                }
+            }
+
+            function startSlideshow() {
+                clearInterval(slideshowInterval);
+                slideshowInterval = setInterval(nextImage, 4000); 
+            }
+
+            function stopSlideshow() {
+                clearInterval(slideshowInterval);
             }
 
             function playTrack() {
@@ -206,6 +213,7 @@
                 audioPlayer.play();
                 playIcon.classList.add('hidden');
                 pauseIcon.classList.remove('hidden');
+                startSlideshow(); 
             }
 
             function pauseTrack() {
@@ -213,22 +221,11 @@
                 audioPlayer.pause();
                 playIcon.classList.remove('hidden');
                 pauseIcon.classList.add('hidden');
+                stopSlideshow(); 
             }
             
             function togglePlayPause() {
                 isPlaying ? pauseTrack() : playTrack();
-            }
-
-            function prevTrack() {
-                currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
-                loadTrack(currentTrackIndex);
-                playTrack();
-            }
-
-            function nextTrack() {
-                currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
-                loadTrack(currentTrackIndex);
-                playTrack();
             }
 
             function formatTime(seconds) {
@@ -257,17 +254,25 @@
 
             // --- Инициализация и обработчики событий ---
             playPauseBtn.addEventListener('click', togglePlayPause);
-            prevBtn.addEventListener('click', prevTrack);
-            nextBtn.addEventListener('click', nextTrack);
-            audioPlayer.addEventListener('ended', nextTrack);
+            
+            nextBtn.addEventListener('click', () => {
+                nextImage();
+                restartSlideshow();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                prevImage();
+                restartSlideshow();
+            });
+
             audioPlayer.addEventListener('timeupdate', updateProgress);
             audioPlayer.addEventListener('loadedmetadata', () => {
                  totalDurationEl.textContent = formatTime(audioPlayer.duration);
             });
+            audioPlayer.loop = true; 
             progressContainer.addEventListener('click', setProgress);
 
-            renderPlaylist();
-            loadTrack(currentTrackIndex);
+            loadTrack();
         });
     </script>
 </body>
