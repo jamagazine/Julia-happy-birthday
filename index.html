@@ -14,8 +14,8 @@
             font-family: 'Lato', sans-serif;
             background: linear-gradient(160deg, var(--bg-start), var(--bg-end));
             color: var(--text-color);
-            /* НОВОЕ: Плавный переход для фона */
-            transition: background 2s ease;
+            /* ИЗМЕНЕНО: Более плавный переход */
+            transition: background 3s ease-in-out;
         }
 
         .player-container {
@@ -26,8 +26,9 @@
             border: 1px solid rgba(244, 241, 234, 0.18);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             color: var(--accent-color);
-            /* НОВОЕ: Плавный переход для подложки плеера */
-            transition: background 2s ease;
+            /* ИЗМЕНЕНО: Более плавный переход и размер */
+            transition: background 3s ease-in-out;
+            max-width: 345px; /* Уменьшаем размер плеера */
         }
 
         #track-title, .congrats-heading {
@@ -35,7 +36,7 @@
         }
         
         #cover-art {
-            transition: opacity 0.7s ease-in-out;
+            transition: opacity 0.6s ease-in-out;
             border: 2px solid var(--accent-color);
             padding: 4px;
             background-color: transparent; 
@@ -44,8 +45,8 @@
         .control-btn, .carousel-dot, .progress-bar {
             background-color: transparent;
             color: var(--accent-color);
-            /* НОВОЕ: Плавный переход для акцентных элементов */
-            transition: color 2s ease, background-color 2s ease, opacity 2s ease;
+            /* ИЗМЕНЕНО: Более плавный переход */
+            transition: color 3s ease-in-out, background-color 3s ease-in-out, opacity 3s ease-in-out;
         }
         
         #play-pause-btn {
@@ -109,7 +110,7 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 overflow-hidden">
 
-    <div class="player-container w-full max-w-sm p-6">
+    <div class="player-container w-full p-6">
 
         <div class="congrats-message text-center mb-6 border-b pb-6 animate-on-load" style="animation-delay: 0.2s; border-color: rgba(244, 241, 234, 0.2);">
             <h3 class="congrats-heading text-xl font-bold mb-2">Юля, с Днём Рождения!</h3>
@@ -123,7 +124,7 @@
             <div id="carousel-dots" class="flex justify-center gap-2 mt-4"></div>
             <div class="text-center mt-2">
                 <h2 id="track-title" class="text-2xl font-bold">Для тебя</h2>
-                <p id="track-artist" class="text-sm opacity-70">Диана</p>
+                <p id="track-artist" class="text-sm opacity-70">От Ди</p>
             </div>
         </div>
 
@@ -174,7 +175,7 @@
 
             const trackData = {
                 title: 'Для тебя',
-                artist: 'Диана',
+                artist: 'От Ди',
                 src: 'https://jamagazine.github.io/Julia-happy-birthday/For_you.mp3' 
             };
 
@@ -190,23 +191,25 @@
                     }
                 },
                 {
+                    // ИЗМЕНЕНО: Палитра "Барби"
                     src: 'https://jamagazine.github.io/Julia-happy-birthday/2.png',
                     palette: {
-                        '--bg-start': '#B4C5D1',
-                        '--bg-end': '#5E7383',
-                        '--player-bg': 'rgba(60, 75, 88, 0.6)',
+                        '--bg-start': '#F7A399',
+                        '--bg-end': '#F56A79',
+                        '--player-bg': 'rgba(108, 43, 58, 0.6)',
                         '--accent-color': '#FFFFFF',
                         '--pulse-color': 'rgba(255, 255, 255, 0.4)'
                     }
                 },
                 {
+                    // ИЗМЕНЕНО: Палитра "Зелень"
                     src: 'https://jamagazine.github.io/Julia-happy-birthday/3.png',
                     palette: {
-                        '--bg-start': '#4A5C70',
-                        '--bg-end': '#E3A587',
-                        '--player-bg': 'rgba(50, 60, 75, 0.6)',
-                        '--accent-color': '#FDEFE2',
-                        '--pulse-color': 'rgba(253, 239, 226, 0.4)'
+                        '--bg-start': '#F3D08A',
+                        '--bg-end': '#2A5239',
+                        '--player-bg': 'rgba(30, 55, 40, 0.6)',
+                        '--accent-color': '#FFF8E7',
+                        '--pulse-color': 'rgba(255, 248, 231, 0.4)'
                     }
                 },
                 {
@@ -287,15 +290,13 @@
                     };
                     coverArt.style.opacity = 1;
                     updateActiveDot();
-                }, 700);
+                }, 600);
             }
 
             function nextSlide() {
                 const newIndex = (currentImageIndex + 1) % slides.length;
                 showSlide(newIndex);
             }
-
-
 
             function prevSlide() {
                 const newIndex = (currentImageIndex - 1 + slides.length) % slides.length;
@@ -311,7 +312,7 @@
 
             function startSlideshow() {
                 clearInterval(slideshowInterval);
-                slideshowInterval = setInterval(nextSlide, 4000); 
+                slideshowInterval = setInterval(nextSlide, 10000); 
             }
 
             function stopSlideshow() {
