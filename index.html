@@ -12,10 +12,27 @@
         /* CSS переменные теперь будут меняться через JS */
         body {
             font-family: 'Lato', sans-serif;
-            background: linear-gradient(160deg, var(--bg-start), var(--bg-end));
-            color: var(--text-color);
-            /* ИЗМЕНЕНО: Более плавный переход */
+            background: linear-gradient(160deg, var(--bg-start, #A4B0C0), var(--bg-end, #EACDA3));
+            color: var(--text-color, #F4F1EA);
             transition: background 3s ease-in-out;
+        }
+
+        /* НОВОЕ: Стили для экрана-заставки */
+        #start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
         }
 
         .player-container {
@@ -26,9 +43,17 @@
             border: 1px solid rgba(244, 241, 234, 0.18);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             color: var(--accent-color);
-            /* ИЗМЕНЕНО: Более плавный переход и размер */
             transition: background 3s ease-in-out;
-            max-width: 345px; /* Уменьшаем размер плеера */
+            max-width: 345px;
+            /* НОВОЕ: Изначально плеер скрыт */
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+        }
+
+        .player-container.visible {
+            opacity: 1;
+            transform: scale(1);
         }
 
         #track-title, .congrats-heading {
@@ -45,7 +70,6 @@
         .control-btn, .carousel-dot, .progress-bar {
             background-color: transparent;
             color: var(--accent-color);
-            /* ИЗМЕНЕНО: Более плавный переход */
             transition: color 3s ease-in-out, background-color 3s ease-in-out, opacity 3s ease-in-out;
         }
         
@@ -110,6 +134,14 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 overflow-hidden">
 
+    <!-- НОВЫЙ БЛОК: Экран-заставка -->
+    <div id="start-overlay">
+        <button id="start-btn" class="text-white text-lg font-semibold bg-black/20 px-6 py-3 rounded-full border border-white/30 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Начать
+        </button>
+    </div>
+
     <div class="player-container w-full p-6">
 
         <div class="congrats-message text-center mb-6 border-b pb-6 animate-on-load" style="animation-delay: 0.2s; border-color: rgba(244, 241, 234, 0.2);">
@@ -172,6 +204,11 @@
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
             const dotsContainer = document.getElementById('carousel-dots');
+            
+            // НОВОЕ: Элементы заставки
+            const startOverlay = document.getElementById('start-overlay');
+            const startBtn = document.getElementById('start-btn');
+            const playerContainer = document.querySelector('.player-container');
 
             const trackData = {
                 title: 'Для тебя',
@@ -191,7 +228,6 @@
                     }
                 },
                 {
-                    // ИЗМЕНЕНО: Палитра "Барби"
                     src: 'https://jamagazine.github.io/Julia-happy-birthday/2.png',
                     palette: {
                         '--bg-start': '#F7A399',
@@ -202,7 +238,6 @@
                     }
                 },
                 {
-                    // ИЗМЕНЕНО: Палитра "Зелень"
                     src: 'https://jamagazine.github.io/Julia-happy-birthday/3.png',
                     palette: {
                         '--bg-start': '#F3D08A',
@@ -373,6 +408,25 @@
                 }
             }
 
+            // НОВОЕ: Логика для заставки
+            function initApp() {
+                // Показываем плеер
+                playerContainer.classList.add('visible');
+                // Убираем заставку
+                startOverlay.style.opacity = 0;
+                setTimeout(() => {
+                    startOverlay.style.display = 'none';
+                }, 500);
+
+                // Загружаем трек и начинаем анимации
+                loadTrack();
+                
+                // Предзагружаем аудио, чтобы оно было готово к воспроизведению
+                audioPlayer.load();
+            }
+
+            startBtn.addEventListener('click', initApp, { once: true });
+
             playPauseBtn.addEventListener('click', togglePlayPause);
             
             nextBtn.addEventListener('click', () => {
@@ -392,7 +446,7 @@
             audioPlayer.loop = true; 
             progressContainer.addEventListener('click', setProgress);
 
-            loadTrack();
+            // loadTrack() теперь вызывается после нажатия на startBtn
         });
     </script>
 </body>
